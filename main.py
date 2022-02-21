@@ -8,12 +8,22 @@ import string
 from tqdm import tqdm
 import torch.nn.functional as F
 import numpy as np
-train_set = CaptchaSet.CaptchaSet(root_dir='./data/test')
-trainDataload = dataloader.DataLoader(train_set,batch_size=64,shuffle=True,num_workers=0)
-test_set = CaptchaSet.CaptchaSet(root_dir='./data/test')
-testDataload = dataloader.DataLoader(test_set,batch_size=64,shuffle=False,num_workers = 0)
+from torchvision.transforms.functional import to_pil_image
+batch_size = 32
 captcha_lable = '_' + string.ascii_lowercase + string.digits
 n_classes = len(captcha_lable)
+# width, height, n_input_length, n_len = 160, 60, 10, 4
+# train_set = CaptchaSet.CaptchaDataset(captcha_lable, 1000 * batch_size, width, height, n_input_length, n_len)
+# test_set = CaptchaSet.CaptchaDataset(captcha_lable, 100 * batch_size, width, height, n_input_length, n_len)
+train_set = CaptchaSet.CaptchaSet(root_dir='./data/train')
+test_set = CaptchaSet.CaptchaSet(root_dir='./data/test')
+# ppp = train_set[0]
+# ppp = to_pil_image(ppp[0])
+# ppp.show()
+
+trainDataload = dataloader.DataLoader(train_set,batch_size=64,shuffle=True,num_workers=0)
+testDataload = dataloader.DataLoader(test_set,batch_size=64,shuffle=False,num_workers = 0)
+
 loss_fun = nn.CTCLoss(blank=0, reduction='mean').cuda()
 # loss_fun = nn.CTCLoss().cuda()
 # net = Net.CRNN_OCR(n_classes=n_classes).cuda()
@@ -101,7 +111,7 @@ def valid(model, optimizer, epoch, dataloader,characters):
 for epoch in range(1,101):
     train(net, optimizer, epoch, trainDataload,captcha_lable)
     valid(net, optimizer, epoch, testDataload,captcha_lable)
-    if epoch % 5 == 0:
+    if epoch % 3 == 0:
         scheduler.step()
         torch.save(net, 'bbb.pth')
 

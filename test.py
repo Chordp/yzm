@@ -28,10 +28,9 @@ def calc_acc(target, output,characters):
 
 test_set = CaptchaSet.CaptchaSet(root_dir='./data/train')
 model = torch.load('bbb.pth').cpu()
+
+torch.onnx.export(model, torch.randn(1, 3, 80, 160), 'captcha.onnx', verbose=True)
 model.eval()
-
-# torch.onnx.export(model, torch.randn(1, 3, 60, 160), 'captcha.onnx', verbose=True)
-
 for image,target,_,_ in test_set:
     output = model(image.unsqueeze(0))
 

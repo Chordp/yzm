@@ -31,13 +31,13 @@ class CRNN_OCR(nn.Module):
 
         self.rnn = nn.LSTM(input_size=576, hidden_size=hidden_size, num_layers=2, bidirectional=True,dropout=0.2)
         # self.avgpool = nn.AdaptiveAvgPool2d((1, None))
-        self.fc = nn.Sequential(
-            nn.Linear(hidden_size*2 , 512),
-            nn.Hardswish(),
-            # nn.Dropout(p=0.2, inplace=True),
-            nn.Linear(512 , n_classes)
-        )
-        # self.fc = nn.Linear(hidden_size*2 , n_classes)
+        # self.fc = nn.Sequential(
+        #     nn.Linear(hidden_size*2 , 512),
+        #     nn.Hardswish(),
+        #     # nn.Dropout(p=0.2, inplace=True),
+        #     nn.Linear(512 , n_classes)
+        # )
+        self.fc = nn.Linear(hidden_size*2 , n_classes)
     def forward(self, x):
         conv = self.cnn(x)
         # conv = self.avgpool(conv)
@@ -48,9 +48,12 @@ class CRNN_OCR(nn.Module):
         x = x.permute(1,0,2)
         return x
 
+
 def test():
     md = CRNN_OCR()
-    x = torch.randn(1, 3, 60, 160)
+    
+    x = torch.randn(1, 3, 80, 160)
+    # torch.onnx.export(md, x, 'sb.onnx', verbose=True)
     y = md(x)
     print(y.shape)
     # print(md)
